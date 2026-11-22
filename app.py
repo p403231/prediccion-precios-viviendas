@@ -99,16 +99,6 @@ if st.button("Predecir precio"):
 
     st.divider()
 
-with st.expander("Información del modelo"):
-
-    st.subheader("Random Forest Optimizado")
-
-    st.write(
-        "Este modelo utiliza técnicas de Machine Learning "
-        "para estimar el precio de una vivienda a partir "
-        "de sus características."
-    )
-
 
 with st.expander("Rendimiento del modelo"):
 
