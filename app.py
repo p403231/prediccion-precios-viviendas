@@ -137,3 +137,78 @@ with st.expander("Información del modelo"):
         "del condado de King, Washington, Estados Unidos. "
         "Las predicciones están expresadas en dólares estadounidenses."
     )
+
+
+with st.expander("Rendimiento del modelo"):
+
+    st.write(
+        "Resultados obtenidos con el modelo "
+        "Random Forest optimizado sobre el conjunto Test."
+    )
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.metric(
+            label="MAE",
+            value="$130,901.22 USD"
+        )
+
+        st.metric(
+            label="MSE",
+            value="40,573,244,392.06 USD²"
+        )
+
+    with col2:
+        st.metric(
+            label="RMSE",
+            value="$201,428.01 USD"
+        )
+
+        st.metric(
+            label="R²",
+            value="70.95%"
+        )
+
+    st.caption(
+        "Estas métricas corresponden a la evaluación "
+        "del modelo sobre datos de prueba no utilizados "
+        "durante el entrenamiento."
+    )
+
+with st.expander("Rendimiento del modelo"):
+
+    st.write(
+        "Resultados obtenidos con el modelo "
+        "Random Forest optimizado sobre el conjunto Test."
+    )
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.metric(
+            label="MAE",
+            value="$130,901.22 USD"
+        )
+
+        st.metric(
+            label="MSE",
+            value="40,573,244,392.06 USD²"
+        )
+
+    with col2:
+        st.metric(
+            label="RMSE",
+            value="$201,428.01 USD"
+        )
+
+        st.metric(
+            label="R²",
+            value="70.95%"
+        )
+
+    st.caption(
+        "Estas métricas corresponden a la evaluación "
+        "del modelo sobre datos de prueba no utilizados "
+        "durante el entrenamiento."
+    )
