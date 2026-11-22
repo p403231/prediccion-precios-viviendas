@@ -1,167 +1,134 @@
+
 import streamlit as st
 import pandas as pd
 import joblib
+from pathlib import Path
+from pathlib import Path
 
-# Configuración de la página
+BASE_DIR = Path(__file__).resolve().parent
+# ==========================================
+# CONFIGURACIÓN
+# ==========================================
+
 st.set_page_config(
     page_title="Predicción de precios de viviendas",
-    page_icon="🏠"
+    page_icon="🏠",
+    layout="wide"
 )
 
-st.title("Predicción de precios de viviendas")
-st.write("Introduce las características de la vivienda.")
+BASE_DIR = Path(__file__).resolve().parent
 
-# Cargar modelo
-modelo = joblib.load("modelo_viviendas.pkl")
+@st.cache_resource
+def cargar_modelo():
+    return joblib.load(BASE_DIR / "modelo_viviendas.pkl")
 
-# Entradas
-col1, col2 = st.columns(2)
 
-with col1:
-    bedrooms = st.number_input(
-        "Número de habitaciones",
-        min_value=0,
-        value=3
-    )
+# ==========================================
+# MENÚ LATERAL
+# ==========================================
 
-    sqft_m2 = st.number_input(
-        "Superficie habitable (m²)",
-        min_value=1.0,
-        value=185.0
-    )
+st.sidebar.title("🏠 Proyecto Viviendas")
 
-with col2:
-    bathrooms = st.number_input(
-        "Número de baños",
-        min_value=0.0,
-        value=2.0,
-        step=0.25
-    )
-
-    yr_built = st.number_input(
-        "Año de construcción",
-        min_value=1900,
-        max_value=2026,
-        value=2000
-    )
-
-sqft_living = sqft_m2 * 10.7639
-
-st.caption(
-    f"Equivalente a {sqft_living:,.2f} pies cuadrados"
+seccion = st.sidebar.radio(
+    "Selecciona una sección:",
+    [
+        "Inicio",
+        "Dataset",
+        "Análisis descriptivo",
+        "Modelos implementados",
+        "Comparación de modelos",
+        "Predicción de viviendas",
+        "Rendimiento del modelo"
+    ]
 )
 
-grade = st.slider(
-    "Calidad de construcción",
-    min_value=1,
-    max_value=13,
-    value=7
-)
 
-if grade <= 3:
-    calidad = "Muy baja"
-elif grade <= 6:
-    calidad = "Baja o básica"
-elif grade == 7:
-    calidad = "Promedio"
-elif grade <= 9:
-    calidad = "Buena"
-elif grade <= 11:
-    calidad = "Muy buena"
-else:
-    calidad = "Excepcional o de lujo"
+# ==========================================
+# 1. INICIO
+# ==========================================
 
-st.caption(f"Calidad seleccionada: {calidad}")
+if seccion == "Inicio":
 
-vivienda = pd.DataFrame([{
-    "bedrooms": bedrooms,
-    "bathrooms": bathrooms,
-    "sqft_living": sqft_living,
-    "yr_built": yr_built,
-    "grade": grade
-}])
+    st.title("Predicción de precios de viviendas")
 
-if st.button("Predecir precio"):
+    st.header("Sistema de Machine Learning")
 
-    precio = modelo.predict(vivienda)[0]
+    st.write("""
+    Este proyecto tiene como objetivo desarrollar
+    un sistema capaz de estimar el precio de una
+    vivienda a partir de sus características.
 
-    st.divider()
+    Para ello se utilizó el dataset KC House Data,
+    correspondiente a viviendas del condado de
+    King, Washington, Estados Unidos.
 
-    st.metric(
-        label="Precio estimado de la vivienda",
-        value=f"${precio:,.2f} USD"
-    )
+    Se implementaron diferentes algoritmos de
+    regresión y se seleccionó Random Forest
+    optimizado como modelo final.
+    """)
 
-    st.caption(
-        "Estimación realizada mediante Random Forest optimizado. "
-        "El precio real puede variar."
-    )
-
-    st.divider()
-
-
-with st.expander("Rendimiento del modelo"):
-
-    st.write(
-        "Resultados obtenidos con el modelo "
-        "Random Forest optimizado sobre el conjunto Test."
-    )
-
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
 
     with col1:
-        st.metric(
-            label="MAE",
-            value="$130,901.22 USD"
-        )
-
-        st.metric(
-            label="MSE",
-            value="4.0573 × 10¹⁰ USD²"
-        )
+        st.metric("Viviendas registradas", "21,613")
 
     with col2:
-        st.metric(
-            label="RMSE",
-            value="$201,428.01 USD"
-        )
+        st.metric("Variables predictoras", "5")
 
-        st.metric(
-            label="R²",
-            value="70.95%"
-        )
+    with col3:
+        st.metric("R² en Test", "70.95%")
 
-    st.caption(
-        "Estas métricas corresponden a la evaluación "
-        "del modelo sobre datos de prueba no utilizados "
-        "durante el entrenamiento."
-    )
+    st.header("Objetivos del proyecto")
+
+    st.markdown("""
+    - Analizar las características de las viviendas.
+    - Estudiar la relación entre variables y precio.
+    - Comparar diferentes modelos de regresión.
+    - Optimizar hiperparámetros mediante validación cruzada.
+    - Evaluar el rendimiento sobre datos de prueba.
+    - Desarrollar una aplicación para estimar precios.
+    """)
 
 
+# ==========================================
+# 2. DATASET
+# ==========================================
 
-# 1. Información del dataset
-with st.expander("Información del dataset"):
+elif seccion == "Dataset":
+
+    st.title("Información del dataset")
+
     st.subheader("KC House Data")
 
     st.write("""
-    Base de datos de viviendas del condado de King,
-    Washington, Estados Unidos.
-
-    - Total de registros: 21,613
-    - Variable objetivo: price
-    - Tipo de problema: Regresión
+    Base de datos de viviendas del condado de
+    King, Washington, Estados Unidos.
     """)
 
-    st.write("Variables utilizadas:")
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric("Registros", "21,613")
+    col2.metric("Variables predictoras", "5")
+    col3.metric("Tipo de problema", "Regresión")
+
+    st.subheader("Variables utilizadas")
 
     variables = pd.DataFrame({
         "Variable": [
-            "bedrooms", "bathrooms", "sqft_living",
-            "yr_built", "grade", "price"
+            "bedrooms",
+            "bathrooms",
+            "sqft_living",
+            "yr_built",
+            "grade",
+            "price"
         ],
         "Tipo de dato": [
-            "int64", "float64", "int64",
-            "int64", "int64", "float64"
+            "int64",
+            "float64",
+            "int64",
+            "int64",
+            "int64",
+            "float64"
         ],
         "Descripción": [
             "Número de habitaciones",
@@ -173,48 +140,223 @@ with st.expander("Información del dataset"):
         ]
     })
 
-    st.dataframe(variables, hide_index=True)
-
-    st.caption(
-        "Inspección inicial: 21,613 observaciones. "
-        "Se seleccionaron cinco variables predictoras "
-        "para estimar el precio."
+    st.dataframe(
+        variables,
+        hide_index=True,
+        use_container_width=True
     )
 
+    st.subheader("Inspección inicial")
 
-# 2. Modelos implementados
-with st.expander("Modelos implementados"):
     st.write("""
-    Durante el desarrollo del proyecto se evaluaron
-    los siguientes modelos:
+    El dataset contiene 21,613 observaciones.
 
-    1. Dummy Regressor (modelo de referencia)
-    2. Linear Regression
-    3. Ridge Regression
-    4. Lasso Regression
-    5. Random Forest Regressor
-    6. Support Vector Regression (SVR)
-
-    Se optimizaron Ridge, Lasso, Random Forest y SVR
-    mediante búsqueda de hiperparámetros y
-    validación cruzada.
+    Para el desarrollo del modelo se seleccionaron
+    cinco variables independientes y una variable
+    objetivo denominada price.
     """)
 
 
-# 3. Comparación de modelos optimizados
-with st.expander("Comparación de modelos optimizados"):
+# ==========================================
+# 3. ANÁLISIS DESCRIPTIVO
+# ==========================================
 
-    st.write(
-        "Resultados obtenidos mediante validación "
-        "cruzada sobre el conjunto de entrenamiento."
+elif seccion == "Análisis descriptivo":
+
+    st.title("Análisis descriptivo de variables")
+
+    with st.expander(
+        "Distribución de variables",
+        expanded=True
+    ):
+
+        st.subheader("Variables independientes")
+
+        st.write("""
+        Los histogramas permiten observar la
+        distribución de las cinco características
+        utilizadas para entrenar el modelo.
+        """)
+
+        imagen = (
+            BASE_DIR /
+            "graficas/distribucion_variables.png"
+        )
+
+        if imagen.exists():
+            st.image(
+                str(imagen),
+                use_container_width=True
+            )
+        else:
+            st.warning("No se encontró la imagen.")
+
+        st.subheader("Variable objetivo: Precio")
+
+        imagen_precio = (
+            BASE_DIR /
+            "graficas/distribucion_precios.png"
+        )
+
+        if imagen_precio.exists():
+            st.image(
+                str(imagen_precio),
+                use_container_width=True
+            )
+        else:
+            st.warning("No se encontró la imagen.")
+
+
+    with st.expander("Correlación de variables"):
+
+        st.subheader("Matriz de correlación de Pearson")
+
+    st.write("""
+    La siguiente matriz muestra las correlaciones
+    entre las cinco características utilizadas para
+    predecir el precio de las viviendas y la
+    variable objetivo.
+    """)
+
+    # Mostrar matriz de correlación
+    imagen_corr = (
+        BASE_DIR / "graficas/matriz_correlacion.png"
     )
+
+    if imagen_corr.exists():
+        st.image(
+            str(imagen_corr),
+            use_container_width=True
+        )
+    else:
+        st.warning(
+            "No se encontró la matriz de correlación."
+        )
+
+    # Tabla de correlaciones con el precio
+    st.subheader("Correlación con el precio")
+
+    correlaciones = pd.DataFrame({
+        "Variable": [
+            "Superficie habitable",
+            "Calidad de construcción",
+            "Número de baños",
+            "Número de habitaciones",
+            "Año de construcción"
+        ],
+        "Correlación": [
+            0.702035,
+            0.667434,
+            0.525138,
+            0.308350,
+            0.054012
+        ]
+    })
+
+    st.dataframe(
+        correlaciones,
+        hide_index=True,
+        use_container_width=True,
+        column_config={
+            "Correlación": st.column_config.NumberColumn(
+                "Correlación (r)",
+                format="%.4f"
+            )
+        }
+    )
+
+    st.subheader("Interpretación de resultados")
+
+    st.write("""
+    **Hallazgos principales:**
+
+    - La superficie habitable presenta la mayor
+      correlación positiva con el precio (0.7020).
+
+    - La calidad de construcción también presenta
+      una correlación positiva importante (0.6674).
+
+    - El número de baños presenta una correlación
+      positiva moderada (0.5251).
+
+    - El número de habitaciones presenta una
+      correlación positiva más débil (0.3084).
+
+    - El año de construcción presenta una
+      correlación lineal muy débil (0.0540).
+
+    Estas correlaciones no implican causalidad
+    ni representan directamente la importancia
+    de las variables en Random Forest.
+    """)
+
+
+# ==========================================
+# 4. MODELOS IMPLEMENTADOS
+# ==========================================
+
+elif seccion == "Modelos implementados":
+
+    st.title("Modelos de Machine Learning")
+
+    st.write("""
+    Durante el proyecto se implementaron seis
+    algoritmos de regresión.
+    """)
+
+    modelos = pd.DataFrame({
+        "Modelo": [
+            "Dummy Regressor",
+            "Linear Regression",
+            "Ridge Regression",
+            "Lasso Regression",
+            "Random Forest",
+            "Support Vector Regression"
+        ],
+        "Descripción": [
+            "Modelo de referencia basado en la media",
+            "Regresión lineal múltiple",
+            "Regresión lineal con regularización L2",
+            "Regresión lineal con regularización L1",
+            "Ensamble de árboles de decisión",
+            "Regresión mediante máquinas de soporte vectorial"
+        ]
+    })
+
+    st.dataframe(
+        modelos,
+        hide_index=True,
+        use_container_width=True
+    )
+
+    st.subheader("Optimización")
+
+    st.write("""
+    Se optimizaron Ridge, Lasso, Random Forest
+    y SVR mediante búsqueda de hiperparámetros
+    y validación cruzada.
+    """)
+
+
+# ==========================================
+# 5. COMPARACIÓN DE MODELOS
+# ==========================================
+
+elif seccion == "Comparación de modelos":
+
+    st.title("Comparación de modelos optimizados")
+
+    st.write("""
+    Resultados obtenidos mediante validación
+    cruzada sobre el conjunto de entrenamiento.
+    """)
 
     comparacion = pd.DataFrame({
         "Modelo": [
-            "Random Forest",
-            "SVR",
-            "Ridge",
-            "Lasso"
+            "Random Forest Optimizado",
+            "SVR Optimizado",
+            "Ridge Optimizado",
+            "Lasso Optimizado"
         ],
         "MAE": [
             130789.1884,
@@ -262,116 +404,181 @@ with st.expander("Comparación de modelos optimizados"):
         }
     )
 
-    st.write("""
-    **Conclusión:** Random Forest optimizado obtuvo
-    el menor RMSE y el mayor R², mientras que SVR
-    obtuvo el menor MAE.
-
-    Se seleccionó Random Forest como modelo final
-    por su mejor desempeño en RMSE y R².
-    """)
-
-
-# Correlación de variables
-with st.expander("Correlación de variables"):
-
-    st.subheader("Análisis de correlación de Pearson")
-
-    st.write("""
-    La correlación de Pearson permite analizar la
-    relación lineal entre las características de las
-    viviendas y su precio.
-
-    Los valores van de -1 a 1.
-    """)
-
-    correlaciones = pd.DataFrame({
-        "Variable": [
-            "Superficie habitable",
-            "Calidad de construcción",
-            "Número de baños",
-            "Número de habitaciones",
-            "Año de construcción"
-        ],
-        "Correlación": [
-            0.702035,
-            0.667434,
-            0.525138,
-            0.308350,
-            0.054012
-        ]
-    })
-
-    st.dataframe(
-        correlaciones,
-        hide_index=True,
-        use_container_width=True,
-        column_config={
-            "Correlación": st.column_config.NumberColumn(
-                "Correlación (r)",
-                format="%.4f"
-            )
-        }
-    )
-
-    st.subheader("Correlación con el precio")
+    st.subheader("Comparación de RMSE")
 
     st.bar_chart(
-        correlaciones.set_index("Variable"),
-        horizontal=True,
-        x_label="Coeficiente de correlación",
-        y_label="Variable"
+        comparacion.set_index("Modelo")[["RMSE"]]
     )
 
+    st.subheader("Conclusión")
+
     st.write("""
-    **Hallazgos principales:**
+    Random Forest optimizado obtuvo el menor
+    RMSE y el mayor R².
 
-    - La superficie habitable presenta la mayor
-      correlación positiva con el precio (0.7020).
-    - La calidad de construcción también presenta
-      una correlación importante (0.6674).
-    - El año de construcción presenta una relación
-      lineal muy débil con el precio (0.0540).
+    SVR optimizado obtuvo el menor MAE.
 
-    Estas correlaciones no implican causalidad y
-    no determinan por sí solas la importancia de
-    las variables para Random Forest.
+    Se seleccionó Random Forest como modelo final
+    debido a su mejor desempeño en RMSE y R².
     """)
 
 
+# ==========================================
+# 6. PREDICCIÓN DE VIVIENDAS
+# ==========================================
 
-from pathlib import Path
+elif seccion == "Predicción de viviendas":
 
-with st.expander("Distribución de variables"):
+    st.title("Predicción de precios de viviendas")
 
-    st.subheader("Variables independientes")
+    st.write("Introduce las características de la vivienda.")
 
-    st.write("""
-    Los histogramas muestran la distribución de
-    las cinco características utilizadas para
-    entrenar nuestro modelo Random Forest.
-    """)
+    modelo = cargar_modelo()
 
-    st.image(
-        str(Path(__file__).parent /
-            "graficas/distribucion_variables.png"),
-        use_container_width=True
-    )
+    col1, col2 = st.columns(2)
 
-    st.subheader("Variable objetivo: Precio")
+    with col1:
 
-    st.image(
-        str(Path(__file__).parent /
-            "graficas/distribucion_precios.png"),
-        use_container_width=True
-    )
+        bedrooms = st.number_input(
+            "Número de habitaciones",
+            min_value=0,
+            value=3
+        )
+
+        sqft_m2 = st.number_input(
+            "Superficie habitable (m²)",
+            min_value=1.0,
+            value=185.0
+        )
+
+    with col2:
+
+        bathrooms = st.number_input(
+            "Número de baños",
+            min_value=0.0,
+            value=2.0,
+            step=0.25
+        )
+
+        yr_built = st.number_input(
+            "Año de construcción",
+            min_value=1900,
+            max_value=2026,
+            value=2000
+        )
+
+    sqft_living = sqft_m2 * 10.7639
 
     st.caption(
-        "Distribuciones obtenidas del dataset "
-        "KC House Data utilizado en el proyecto."
+        f"Equivalente a {sqft_living:,.2f} pies cuadrados"
     )
 
+    grade = st.slider(
+        "Calidad de construcción",
+        min_value=1,
+        max_value=13,
+        value=7
+    )
+
+    if grade <= 3:
+        calidad = "Muy baja"
+    elif grade <= 6:
+        calidad = "Baja o básica"
+    elif grade == 7:
+        calidad = "Promedio"
+    elif grade <= 9:
+        calidad = "Buena"
+    elif grade <= 11:
+        calidad = "Muy buena"
+    else:
+        calidad = "Excepcional o de lujo"
+
+    st.caption(f"Calidad seleccionada: {calidad}")
+
+    vivienda = pd.DataFrame([{
+        "bedrooms": bedrooms,
+        "bathrooms": bathrooms,
+        "sqft_living": sqft_living,
+        "yr_built": yr_built,
+        "grade": grade
+    }])
+
+    if st.button("Predecir precio"):
+
+        precio = modelo.predict(vivienda)[0]
+
+        st.divider()
+
+        st.metric(
+            label="Precio estimado de la vivienda",
+            value=f"${precio:,.2f} USD"
+        )
+
+        st.caption(
+            "Estimación realizada mediante Random Forest "
+            "optimizado. El precio real puede variar."
+        )
 
 
+# ==========================================
+# 7. RENDIMIENTO DEL MODELO
+# ==========================================
 
+elif seccion == "Rendimiento del modelo":
 
+    st.title("Rendimiento del modelo final")
+
+    st.write("""
+    Resultados obtenidos con Random Forest
+    optimizado sobre el conjunto Test.
+    """)
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        st.metric(
+            label="MAE",
+            value="$130,901.22 USD"
+        )
+
+        st.metric(
+            label="MSE",
+            value="4.0573 × 10¹⁰ USD²"
+        )
+
+    with col2:
+
+        st.metric(
+            label="RMSE",
+            value="$201,428.01 USD"
+        )
+
+        st.metric(
+            label="R²",
+            value="70.95%"
+        )
+
+    st.subheader("Interpretación de resultados")
+
+    st.write("""
+    **MAE:** El modelo presenta un error absoluto
+    promedio de aproximadamente 130,901 dólares.
+
+    **RMSE:** El error cuadrático medio expresado
+    en unidades monetarias es de aproximadamente
+    201,428 dólares. Esta métrica penaliza
+    especialmente los errores grandes.
+
+    **MSE:** Representa el promedio de los errores
+    al cuadrado.
+
+    **R²:** El modelo explica aproximadamente el
+    70.95% de la variabilidad del precio en el
+    conjunto de prueba.
+    """)
+
+    st.caption(
+        "Estas métricas corresponden a datos de prueba "
+        "no utilizados durante el entrenamiento."
+    )
