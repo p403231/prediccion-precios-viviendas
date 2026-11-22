@@ -352,48 +352,47 @@ elif seccion == "Comparación de modelos":
     )
 
 
-st.subheader("Comparación de métricas")
+    st.subheader("Comparación de métricas")
 
-metrica = st.segmented_control(
-    "Selecciona la métrica que deseas comparar:",
-    options=["MAE", "MSE", "RMSE", "R²"],
-    default="RMSE",
-    selection_mode="single"
-)
-
-
-columna = "R2" if metrica == "R²" else metrica
-
-
-datos_grafica = comparacion[
-    ["Modelo", columna]
-].copy()
-
-
-datos_grafica = datos_grafica.sort_values(
-    by=columna,
-    ascending=(columna != "R2")
-)
-
-st.bar_chart(
-    datos_grafica.set_index("Modelo"),
-    y=columna,
-    x_label="Modelo",
-    y_label=metrica,
-    use_container_width=True
-)
-
-if columna == "R2":
-    st.info(
-        "En R², los valores más altos indican "
-        "un mejor desempeño del modelo."
-    )
-else:
-    st.info(
-        f"En {metrica}, los valores más bajos "
-        "indican un menor error de predicción."
+    metrica = st.segmented_control(
+        "Selecciona la métrica que deseas comparar:",
+        options=["MAE", "MSE", "RMSE", "R²"],
+        default="RMSE",
+        selection_mode="single"
     )
 
+
+    columna = "R2" if metrica == "R²" else metrica
+
+
+    datos_grafica = comparacion[
+        ["Modelo", columna]
+    ].copy()
+
+
+    datos_grafica = datos_grafica.sort_values(
+        by=columna,
+        ascending=(columna != "R2")
+    )
+
+    st.bar_chart(
+        datos_grafica.set_index("Modelo"),
+        y=columna,
+        x_label="Modelo",
+        y_label=metrica,
+        use_container_width=True
+    )
+
+    if columna == "R2":
+        st.info(
+            "En R², los valores más altos indican "
+            "un mejor desempeño del modelo."
+        )
+    else:
+        st.info(
+            f"En {metrica}, los valores más bajos "
+            "indican un menor error de predicción."
+        )
 
     st.subheader("Conclusión")
 
@@ -557,4 +556,3 @@ elif seccion == "Rendimiento del modelo":
     70.95% de la variabilidad del precio en el
     conjunto de prueba.
     """)
-
