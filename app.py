@@ -211,30 +211,24 @@ elif seccion == "Análisis descriptivo":
 
         st.subheader("Matriz de correlación de Pearson")
 
-    st.write("""
-    La siguiente matriz muestra las correlaciones
-    entre las cinco características utilizadas para
-    predecir el precio de las viviendas y la
-    variable objetivo.
-    """)
+        st.write("""
+        La siguiente matriz muestra las correlaciones
+        entre las variables predictoras y el precio.
+        """)
 
-    # Mostrar matriz de correlación
-    imagen_corr = (
-        BASE_DIR / "graficas/matriz_correlacion.png"
-    )
-
-    if imagen_corr.exists():
-        st.image(
-            str(imagen_corr),
-            use_container_width=True
-        )
-    else:
-        st.warning(
-            "No se encontró la matriz de correlación."
+        imagen_corr = (
+            BASE_DIR / "graficas/matriz_correlacion.png"
         )
 
-    # Tabla de correlaciones con el precio
-    st.subheader("Correlación con el precio")
+        if imagen_corr.exists():
+            st.image(
+                str(imagen_corr),
+                use_container_width=True
+            )
+        else:
+            st.warning("No se encontró la matriz.")
+
+        st.subheader("Correlación con el precio")
 
     correlaciones = pd.DataFrame({
         "Variable": [
@@ -292,54 +286,7 @@ elif seccion == "Análisis descriptivo":
 
 
 # ==========================================
-# 4. MODELOS IMPLEMENTADOS
-# ==========================================
-
-elif seccion == "Modelos implementados":
-
-    st.title("Modelos de Machine Learning")
-
-    st.write("""
-    Durante el proyecto se implementaron seis
-    algoritmos de regresión.
-    """)
-
-    modelos = pd.DataFrame({
-        "Modelo": [
-            "Dummy Regressor",
-            "Linear Regression",
-            "Ridge Regression",
-            "Lasso Regression",
-            "Random Forest",
-            "Support Vector Regression"
-        ],
-        "Descripción": [
-            "Modelo de referencia basado en la media",
-            "Regresión lineal múltiple",
-            "Regresión lineal con regularización L2",
-            "Regresión lineal con regularización L1",
-            "Ensamble de árboles de decisión",
-            "Regresión mediante máquinas de soporte vectorial"
-        ]
-    })
-
-    st.dataframe(
-        modelos,
-        hide_index=True,
-        use_container_width=True
-    )
-
-    st.subheader("Optimización")
-
-    st.write("""
-    Se optimizaron Ridge, Lasso, Random Forest
-    y SVR mediante búsqueda de hiperparámetros
-    y validación cruzada.
-    """)
-
-
-# ==========================================
-# 5. COMPARACIÓN DE MODELOS
+# 4. COMPARACION DE MODELOS
 # ==========================================
 
 elif seccion == "Comparación de modelos":
@@ -404,11 +351,49 @@ elif seccion == "Comparación de modelos":
         }
     )
 
-    st.subheader("Comparación de RMSE")
 
-    st.bar_chart(
-        comparacion.set_index("Modelo")[["RMSE"]]
+st.subheader("Comparación de métricas")
+
+metrica = st.segmented_control(
+    "Selecciona la métrica que deseas comparar:",
+    options=["MAE", "MSE", "RMSE", "R²"],
+    default="RMSE",
+    selection_mode="single"
+)
+
+
+columna = "R2" if metrica == "R²" else metrica
+
+
+datos_grafica = comparacion[
+    ["Modelo", columna]
+].copy()
+
+
+datos_grafica = datos_grafica.sort_values(
+    by=columna,
+    ascending=(columna != "R2")
+)
+
+st.bar_chart(
+    datos_grafica.set_index("Modelo"),
+    y=columna,
+    x_label="Modelo",
+    y_label=metrica,
+    use_container_width=True
+)
+
+if columna == "R2":
+    st.info(
+        "En R², los valores más altos indican "
+        "un mejor desempeño del modelo."
     )
+else:
+    st.info(
+        f"En {metrica}, los valores más bajos "
+        "indican un menor error de predicción."
+    )
+
 
     st.subheader("Conclusión")
 
@@ -424,7 +409,7 @@ elif seccion == "Comparación de modelos":
 
 
 # ==========================================
-# 6. PREDICCIÓN DE VIVIENDAS
+# 5. PREDICCIÓN DE VIVIENDAS
 # ==========================================
 
 elif seccion == "Predicción de viviendas":
@@ -514,14 +499,9 @@ elif seccion == "Predicción de viviendas":
             value=f"${precio:,.2f} USD"
         )
 
-        st.caption(
-            "Estimación realizada mediante Random Forest "
-            "optimizado. El precio real puede variar."
-        )
-
 
 # ==========================================
-# 7. RENDIMIENTO DEL MODELO
+# 6. RENDIMIENTO DEL MODELO
 # ==========================================
 
 elif seccion == "Rendimiento del modelo":
@@ -578,7 +558,3 @@ elif seccion == "Rendimiento del modelo":
     conjunto de prueba.
     """)
 
-    st.caption(
-        "Estas métricas corresponden a datos de prueba "
-        "no utilizados durante el entrenamiento."
-    )
