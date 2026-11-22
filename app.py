@@ -35,7 +35,6 @@ seccion = st.sidebar.radio(
         "Inicio",
         "Dataset",
         "Análisis descriptivo",
-        "Modelos implementados",
         "Comparación de modelos",
         "Predicción de viviendas",
         "Rendimiento del modelo"
