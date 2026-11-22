@@ -127,7 +127,7 @@ with st.expander("Rendimiento del modelo"):
 
         st.metric(
             label="MSE",
-            value="40,573,244,392.06 USD²"
+            value="4.0573 × 10¹⁰ USD²"
         )
 
     with col2:
