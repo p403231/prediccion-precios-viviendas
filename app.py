@@ -272,4 +272,106 @@ with st.expander("Comparación de modelos optimizados"):
     """)
 
 
+# Correlación de variables
+with st.expander("Correlación de variables"):
+
+    st.subheader("Análisis de correlación de Pearson")
+
+    st.write("""
+    La correlación de Pearson permite analizar la
+    relación lineal entre las características de las
+    viviendas y su precio.
+
+    Los valores van de -1 a 1.
+    """)
+
+    correlaciones = pd.DataFrame({
+        "Variable": [
+            "Superficie habitable",
+            "Calidad de construcción",
+            "Número de baños",
+            "Número de habitaciones",
+            "Año de construcción"
+        ],
+        "Correlación": [
+            0.702035,
+            0.667434,
+            0.525138,
+            0.308350,
+            0.054012
+        ]
+    })
+
+    st.dataframe(
+        correlaciones,
+        hide_index=True,
+        use_container_width=True,
+        column_config={
+            "Correlación": st.column_config.NumberColumn(
+                "Correlación (r)",
+                format="%.4f"
+            )
+        }
+    )
+
+    st.subheader("Correlación con el precio")
+
+    st.bar_chart(
+        correlaciones.set_index("Variable"),
+        horizontal=True,
+        x_label="Coeficiente de correlación",
+        y_label="Variable"
+    )
+
+    st.write("""
+    **Hallazgos principales:**
+
+    - La superficie habitable presenta la mayor
+      correlación positiva con el precio (0.7020).
+    - La calidad de construcción también presenta
+      una correlación importante (0.6674).
+    - El año de construcción presenta una relación
+      lineal muy débil con el precio (0.0540).
+
+    Estas correlaciones no implican causalidad y
+    no determinan por sí solas la importancia de
+    las variables para Random Forest.
+    """)
+
+
+
+from pathlib import Path
+
+with st.expander("Distribución de variables"):
+
+    st.subheader("Variables independientes")
+
+    st.write("""
+    Los histogramas muestran la distribución de
+    las cinco características utilizadas para
+    entrenar nuestro modelo Random Forest.
+    """)
+
+    st.image(
+        str(Path(__file__).parent /
+            "graficas/distribucion_variables.png"),
+        use_container_width=True
+    )
+
+    st.subheader("Variable objetivo: Precio")
+
+    st.image(
+        str(Path(__file__).parent /
+            "graficas/distribucion_precios.png"),
+        use_container_width=True
+    )
+
+    st.caption(
+        "Distribuciones obtenidas del dataset "
+        "KC House Data utilizado en el proyecto."
+    )
+
+
+
+
 
