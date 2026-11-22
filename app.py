@@ -149,3 +149,137 @@ with st.expander("Rendimiento del modelo"):
 
 
 
+# 1. Información del dataset
+with st.expander("Información del dataset"):
+    st.subheader("KC House Data")
+
+    st.write("""
+    Base de datos de viviendas del condado de King,
+    Washington, Estados Unidos.
+
+    - Total de registros: 21,613
+    - Variable objetivo: price
+    - Tipo de problema: Regresión
+    """)
+
+    st.write("Variables utilizadas:")
+
+    variables = pd.DataFrame({
+        "Variable": [
+            "bedrooms", "bathrooms", "sqft_living",
+            "yr_built", "grade", "price"
+        ],
+        "Tipo de dato": [
+            "int64", "float64", "int64",
+            "int64", "int64", "float64"
+        ],
+        "Descripción": [
+            "Número de habitaciones",
+            "Número de baños",
+            "Superficie habitable en pies cuadrados",
+            "Año de construcción",
+            "Calidad de construcción",
+            "Precio de la vivienda (USD)"
+        ]
+    })
+
+    st.dataframe(variables, hide_index=True)
+
+    st.caption(
+        "Inspección inicial: 21,613 observaciones. "
+        "Se seleccionaron cinco variables predictoras "
+        "para estimar el precio."
+    )
+
+
+# 2. Modelos implementados
+with st.expander("Modelos implementados"):
+    st.write("""
+    Durante el desarrollo del proyecto se evaluaron
+    los siguientes modelos:
+
+    1. Dummy Regressor (modelo de referencia)
+    2. Linear Regression
+    3. Ridge Regression
+    4. Lasso Regression
+    5. Random Forest Regressor
+    6. Support Vector Regression (SVR)
+
+    Se optimizaron Ridge, Lasso, Random Forest y SVR
+    mediante búsqueda de hiperparámetros y
+    validación cruzada.
+    """)
+
+
+# 3. Comparación de modelos optimizados
+with st.expander("Comparación de modelos optimizados"):
+
+    st.write(
+        "Resultados obtenidos mediante validación "
+        "cruzada sobre el conjunto de entrenamiento."
+    )
+
+    comparacion = pd.DataFrame({
+        "Modelo": [
+            "Random Forest",
+            "SVR",
+            "Ridge",
+            "Lasso"
+        ],
+        "MAE": [
+            130789.1884,
+            129179.4076,
+            145139.1894,
+            145424.3328
+        ],
+        "MSE": [
+            4.397923e10,
+            4.729115e10,
+            5.193870e10,
+            5.194081e10
+        ],
+        "RMSE": [
+            209653.1956,
+            216983.6323,
+            227694.3785,
+            227703.6734
+        ],
+        "R2": [
+            0.6687,
+            0.6470,
+            0.6106,
+            0.6106
+        ]
+    })
+
+    st.dataframe(
+        comparacion,
+        hide_index=True,
+        use_container_width=True,
+        column_config={
+            "MAE": st.column_config.NumberColumn(
+                "MAE (USD)", format="%.2f"
+            ),
+            "MSE": st.column_config.NumberColumn(
+                "MSE (USD²)", format="%.3e"
+            ),
+            "RMSE": st.column_config.NumberColumn(
+                "RMSE (USD)", format="%.2f"
+            ),
+            "R2": st.column_config.NumberColumn(
+                "R²", format="%.4f"
+            )
+        }
+    )
+
+    st.write("""
+    **Conclusión:** Random Forest optimizado obtuvo
+    el menor RMSE y el mayor R², mientras que SVR
+    obtuvo el menor MAE.
+
+    Se seleccionó Random Forest como modelo final
+    por su mejor desempeño en RMSE y R².
+    """)
+
+
+
