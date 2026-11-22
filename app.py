@@ -223,7 +223,7 @@ elif seccion == "Análisis descriptivo":
         if imagen_corr.exists():
             st.image(
                 str(imagen_corr),
-                use_container_width=650
+                use_container_width=450
             )
         else:
             st.warning("No se encontró la matriz.")
