@@ -109,35 +109,6 @@ with st.expander("Información del modelo"):
         "de sus características."
     )
 
-    st.write("### Rendimiento del modelo en Test")
-
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.metric("MAE", "$130,901")
-
-    with col2:
-        st.metric("RMSE", "$201,428")
-
-    with col3:
-        st.metric("R²", "0.7095")
-
-    st.write("### Características utilizadas")
-
-    st.write(
-        "- Número de habitaciones\n"
-        "- Número de baños\n"
-        "- Superficie habitable\n"
-        "- Año de construcción\n"
-        "- Calidad de construcción"
-    )
-
-    st.info(
-        "El modelo fue entrenado con datos de viviendas "
-        "del condado de King, Washington, Estados Unidos. "
-        "Las predicciones están expresadas en dólares estadounidenses."
-    )
-
 
 with st.expander("Rendimiento del modelo"):
 
@@ -212,3 +183,6 @@ with st.expander("Rendimiento del modelo"):
         "del modelo sobre datos de prueba no utilizados "
         "durante el entrenamiento."
     )
+
+
+
